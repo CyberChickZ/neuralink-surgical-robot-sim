@@ -1,0 +1,17 @@
+# Robustness: 3x stronger pulsation, tougher tissue (6 mN puncture).
+name: stress
+duration: 150
+initial:
+  joints: {lift_y: 0.235}   # needle tip ~5 cm above the brain (head hover, option A)
+needle:
+  insert_speed: 0.1     # m/s
+  retract_speed: 0.3    # m/s
+brain:
+  amp_card_pp: 0.0003
+  f_card: 1.3
+  amp_resp_pp: 0.0015
+  f_resp: 0.3333333
+  puncture_force_n: 0.006
+pass:
+  max_vessel_hits: 0
+  min_punctured: 6

@@ -1,0 +1,223 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="robot_v1">
+    <link name="00_Base">
+        <inertial>
+            <origin xyz="0.0 0.225 -8.278422885470921e-17" rpy="0.0 0.0 0.0" />
+            <mass value="3532.499999999998" />
+            <inertia ixx="353.98593749999986" iyy="588.7499999999992" izz="353.9859374999993" ixy="4.678964614868164e-14" iyz="-1.9008293747901888e-14" ixz="0.0" />
+        </inertial>
+        <visual name="00_Base_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/00_Base.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="00_Base_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/00_Base.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="01_Column">
+        <inertial>
+            <origin xyz="0.0 0.8747560975609757 -0.013414634146341484" rpy="0.0 0.0 0.0" />
+            <mass value="579.3299999999997" />
+            <inertia ixx="42.70031145731707" iyy="8.3266481707317" izz="43.06361328658534" ixy="-5.848705768585205e-15" iyz="2.644205487804875" ixz="0.0" />
+        </inertial>
+        <visual name="01_Column_visual">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/01_Column.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="01_Column_collision">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/01_Column.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="02_Carriage">
+        <inertial>
+            <origin xyz="6.217248937900877e-17 0.21315789473684305 -0.021052631578947184" rpy="0.0 -0.0 0.0" />
+            <mass value="268.46999999999997" />
+            <inertia ixx="8.881380513164572" iyy="4.061135526315686" izz="8.847294986848738" ixy="2.965878964644732e-14" iyz="1.6565565789474483" ixz="2.012825905950422e-14" />
+        </inertial>
+        <visual name="02_Carriage_visual">
+            <origin xyz="-0.07817994853729766 -1.2252070638629566 0.1606351003074084" rpy="-9.020562075079398e-17 1.5612511283791276e-17 8.881784197001229e-16" />
+            <geometry>
+                <mesh filename="meshes/02_Carriage.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="02_Carriage_collision">
+            <origin xyz="-0.07817994853729766 -1.2252070638629566 0.1606351003074084" rpy="-9.020562075079398e-17 1.5612511283791276e-17 8.881784197001229e-16" />
+            <geometry>
+                <mesh filename="meshes/02_Carriage.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="03_Arm">
+        <inertial>
+            <origin xyz="1.9876501837780306e-16 9.947598300641404e-16 0.050000000000001064" rpy="0.0 -0.0 0.0" />
+            <mass value="68.96537558267042" />
+            <inertia ixx="0.5547282618847191" iyy="0.5547282618847706" izz="0.9945142311317028" ixy="-5.483161658048473e-16" iyz="7.105427357601002e-15" ixz="-1.827720552682727e-16" />
+        </inertial>
+        <visual name="03_Arm_visual">
+            <origin xyz="6.0257562681238383e-33 -1.2 -0.15" rpy="-1.232595164407831e-32 -4.307521730114546e-65 -3.494676804272541e-33" />
+            <geometry>
+                <mesh filename="meshes/03_Arm.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="03_Arm_collision">
+            <origin xyz="6.0257562681238383e-33 -1.2 -0.15" rpy="-1.232595164407831e-32 -4.307521730114546e-65 -3.494676804272541e-33" />
+            <geometry>
+                <mesh filename="meshes/03_Arm.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="04_Wrist_A">
+        <inertial>
+            <origin xyz="0.1923826207045586 5.684341886080802e-16 0.05000000000000096" rpy="0.0 -0.0 0.0" />
+            <mass value="74.28843895667511" />
+            <inertia ixx="0.29534647639182765" iyy="1.4690786226877641" izz="1.640611034151803" ixy="0.0" iyz="-3.552713678800501e-15" ixz="-8.881784197001252e-16" />
+        </inertial>
+        <visual name="04_Wrist_A_visual">
+            <origin xyz="-0.2 -1.2 -0.15" rpy="-0.0 1.5707963267948966 0" />
+            <geometry>
+                <mesh filename="meshes/04_Wrist_A.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="04_Wrist_A_collision">
+            <origin xyz="-0.2 -1.2 -0.15" rpy="-0.0 1.5707963267948966 0" />
+            <geometry>
+                <mesh filename="meshes/04_Wrist_A.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="05_Wrist_B">
+        <inertial>
+            <origin xyz="0.05153101287173129 0.0328558850866662 -0.10854177760951605" rpy="0.0 -0.0 0.0" />
+            <mass value="157.8649275416106" />
+            <inertia ixx="2.772417954245441" iyy="3.1071728359152075" izz="2.417479086696403" ixy="-0.13004723605972401" iyz="0.30856616383301816" ixz="-0.45092742200506875" />
+        </inertial>
+        <visual name="05_Wrist_B_visual">
+            <origin xyz="-0.55 -1.2 -0.15" rpy="-0.0 1.5707963267948966 0" />
+            <geometry>
+                <mesh filename="meshes/05_Wrist_B.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="05_Wrist_B_collision">
+            <origin xyz="-0.55 -1.2 -0.15" rpy="-0.0 1.5707963267948966 0" />
+            <geometry>
+                <mesh filename="meshes/05_Wrist_B.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="06_Head">
+        <inertial>
+            <origin xyz="0.0 7.105427357601002e-17 0.059092583845064016" rpy="0.0 -0.0 0.0" />
+            <mass value="0.8309225000000003" />
+            <inertia ixx="0.001041310521483707" iyy="0.001041310521483707" izz="0.0001260693645832034" ixy="5.204170427930421e-18" iyz="0.0" ixz="6.938893903907228e-18" />
+        </inertial>
+        <visual name="06_Head_visual">
+            <origin xyz="-0.025 -0.625 1.199" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/06_Head.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="06_Head_collision">
+            <origin xyz="-0.025 -0.625 1.199" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/06_Head.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="06_StageX">
+        <inertial>
+            <origin xyz="0.0 7.105427357601002e-17 0.0004999999999998295" rpy="0.0 -0.0 0.0" />
+            <mass value="0.007064999999999598" />
+            <inertia ixx="5.304637499970594e-07" iyy="5.304637499987941e-07" izz="1.0597499999990406e-06" ixy="1.3552527156068805e-20" iyz="-8.673617379884035e-19" ixz="-8.131516293641283e-20" />
+        </inertial>
+        <visual name="06_StageX_visual">
+            <origin xyz="-0.025 -0.625 1.2" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/06_StageX.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="06_StageX_collision">
+            <origin xyz="-0.025 -0.625 1.2" rpy="-1.5707963267948966 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/06_StageX.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <link name="07_Needle">
+        <inertial>
+            <origin xyz="0.0 -0.010128205128205251 0.002499999999999929" rpy="0.0 -0.0 0.0" />
+            <mass value="0.013776749999999996" />
+            <inertia ixx="5.7186629170771774e-06" iyy="5.724121875366056e-08" izz="5.7186629170702385e-06" ixy="-5.421010862427522e-20" iyz="-1.734723475976807e-18" ixz="-2.710505431213761e-20" />
+        </inertial>
+        <visual name="07_Needle_visual">
+            <origin xyz="-0.025 -1.105 -0.6225" rpy="0.0 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/07_Needle.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </visual>
+        <collision name="07_Needle_collision">
+            <origin xyz="-0.025 -1.105 -0.6225" rpy="0.0 -0.0 0.0" />
+            <geometry>
+                <mesh filename="meshes/07_Needle.stl" scale="0.001 0.001 0.001" />
+            </geometry>
+        </collision>
+    </link>
+    <joint name="01_Column_lift_y" type="prismatic">
+        <origin xyz="0.0 1.215 0.05" rpy="0.0 -0.0 0.0" />
+        <parent link="01_Column" />
+        <child link="02_Carriage" />
+        <axis xyz="0.0 1.0 0.0" />
+        <limit lower="0.0" upper="0.25" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="02_Carriage_arm_roll_z" type="revolute">
+        <origin xyz="0.0 -0.015 0.1" rpy="1.232595164407831e-32 -0.0 3.494676804272541e-33" />
+        <parent link="02_Carriage" />
+        <child link="03_Arm" />
+        <axis xyz="0.0 1.232595164407831e-32 1.0" />
+        <limit lower="-0.785398" upper="0.785398" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="04_Wrist_A_wrist_pitch_x" type="revolute">
+        <origin xyz="0.35000000000000003 0.0 0.0" rpy="0.0 -0.0 0.0" />
+        <parent link="04_Wrist_A" />
+        <child link="05_Wrist_B" />
+        <axis xyz="0.0 0.0 1.0" />
+        <limit lower="-0.523599" upper="0.523599" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="03_Arm_head_rot" type="revolute">
+        <origin xyz="-0.15 0.0 0.05" rpy="-3.494676804272541e-33 -1.5707963267948966 0" />
+        <parent link="03_Arm" />
+        <child link="04_Wrist_A" />
+        <axis xyz="0.0 0.0 1.0" />
+        <limit lower="-0.523599" upper="0.523599" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="06_StageX_stage_x" type="prismatic">
+        <origin xyz="0.0 0.0 0.0009999999999999432" rpy="0.0 -0.0 0.0" />
+        <parent link="06_StageX" />
+        <child link="06_Head" />
+        <axis xyz="1.0 0.0 0.0" />
+        <limit lower="-0.0125" upper="0.0125" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="05_Wrist_B_stage_z" type="prismatic">
+        <origin xyz="0.075 0.0 -0.17500000000000002" rpy="1.5707963267948966 1.5707963267948966 0" />
+        <parent link="05_Wrist_B" />
+        <child link="06_StageX" />
+        <axis xyz="0.0 1.0 0.0" />
+        <limit lower="-0.0125" upper="0.0125" effort="1000000" velocity="1000000" />
+    </joint>
+    <joint name="06_Head_滑块-10" type="prismatic">
+        <origin xyz="0.0 -0.0025 0.09400000000000006" rpy="-1.5707963267948966 -0.0 0.0" />
+        <parent link="06_Head" />
+        <child link="07_Needle" />
+        <axis xyz="0.0 1.0 0.0" />
+        <limit lower="-0.025" upper="0.0" effort="1000000" velocity="1000000" />
+    </joint>
+</robot>

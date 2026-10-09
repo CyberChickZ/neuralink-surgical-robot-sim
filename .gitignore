@@ -1,0 +1,10 @@
+# third-party data (cloned by the asset build), generated assets, experiments, private notes
+third_party/
+isaac_demo/
+robot/
+sofa_brain/
+tools/
+robot_v1/*.md
+__pycache__/
+*.pyc
+*.sif

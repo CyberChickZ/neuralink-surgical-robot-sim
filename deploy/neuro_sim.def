@@ -1,0 +1,39 @@
+# One self-contained image: ROS2 Jazzy + Gazebo Harmonic + SOFA v26.06 + neuro_demo code + world/robot/brain assets.
+# Build (CPU node, ~10 min):  sbatch neuro_demo/deploy/build_image.sbatch
+# Use:   apptainer run --nv neuro_sim.sif run my_controller.py --duration 120
+Bootstrap: localimage
+From: /nfs/hpc/dgx2-2/zhanhaoc/neuro_demo/ros/ros_jazzy_desktop_full.sif
+
+%files
+    /nfs/hpc/share/zhanhaoc/neuro_demo/gz_demo /opt/neuro/gz_demo
+    /nfs/hpc/share/zhanhaoc/neuro_demo/service /opt/neuro/service
+    /nfs/hpc/share/zhanhaoc/neuro_demo/config.yaml /opt/neuro/config.yaml
+    /nfs/hpc/share/zhanhaoc/neuro_demo/deploy/neuro.sh /opt/neuro/neuro
+    /nfs/hpc/share/zhanhaoc/neuro_demo/robot_v1/meshes /opt/neuro/robot_v1/meshes
+    /nfs/hpc/dgx2-2/zhanhaoc/neuro_demo/gz /opt/neuro/gz
+    /nfs/hpc/dgx2-2/zhanhaoc/envs/sofa/lib/python3.12/site-packages/imageio_ffmpeg/binaries/ffmpeg-linux-x86_64-v7.0.2 /opt/neuro/bin/ffmpeg
+
+%setup
+    # SOFA ships some dangling .so symlinks; %files dereferences links and fails, so copy with links preserved
+    mkdir -p ${APPTAINER_ROOTFS}/opt && cp -a /nfs/hpc/dgx2-2/zhanhaoc/sofa/SOFA_v26.06.00_Linux ${APPTAINER_ROOTFS}/opt/sofa
+
+%post
+    # generated assets carry absolute host paths -> rewrite to the image layout
+    for f in /opt/neuro/gz/world.sdf /opt/neuro/gz/neuro_robot/model.sdf /opt/neuro/gz/robot_gz.urdf; do
+        sed -i "s#/nfs/hpc/dgx2-2/zhanhaoc/neuro_demo/gz#/opt/neuro/gz#g; s#/nfs/hpc/share/zhanhaoc/neuro_demo/robot_v1#/opt/neuro/robot_v1#g" "$f"
+    done
+    chmod -R a+rX /opt/neuro /opt/sofa
+
+%environment
+    export NEURO_ROOT=/opt/neuro NEURO_GZ=/opt/neuro/gz NEURO_IN_CONTAINER=1 GZ_SIM_RESOURCE_PATH=/opt/neuro/gz
+    export SOFA_ROOT=/opt/sofa LD_LIBRARY_PATH=/opt/sofa/lib:${LD_LIBRARY_PATH:-}
+    export PYTHONPATH=/opt/sofa/plugins/SofaPython3/lib/python3/site-packages:${PYTHONPATH:-}
+    export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 ACCEPT_EULA=Y
+    # ROS env is sourced by /opt/neuro/neuro (bash): setup.bash cannot locate itself when %environment runs under sh
+
+%runscript
+    exec /opt/neuro/neuro "$@"
+
+%labels
+    name neuro_sim
+    version 0.1

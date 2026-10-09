@@ -1,0 +1,48 @@
+#!/bin/bash
+# neuro -- one-command access to the surgical-robot simulation service (packaged image, any GPU node).
+#
+#   neuro run <controller.py> [scenario.yaml]   submit: initial state -> your controller -> report + dashboard video
+#   neuro session [scenario.yaml]               start a live simulation (1 h) for remote/manual control
+#   neuro watch  <run_dir>                      live dashboard of a running simulation (from your VNC)
+#   neuro teleop <run_dir>                      keyboard control of a running simulation
+#   neuro shell  <run_dir>                      shell with ROS2 + neuro_sdk pointed at that simulation
+#   neuro exec   <run_dir> <controller.py>      run a controller from THIS node against a live session (remote control)
+#   neuro report <run_dir>                      print the run's metrics (pass/fail, insertions, vessel hits)
+#
+# Results: ${NEURO_RUNS:-/nfs/hpc/dgx2-2/$USER/neuro_runs}/<jobid>/ : metrics.json, dashboard.mp4, bag/, *.log
+set -e
+SIF=${NEURO_SIF:-/nfs/hpc/dgx2-2/zhanhaoc/neuro_demo/neuro_sim.sif}
+RUNS=${NEURO_RUNS:-/nfs/hpc/dgx2-2/$USER/neuro_runs}; mkdir -p "$RUNS"
+PART=${NEURO_PARTITION:-dgxh,ampere,dgx2}
+EGL=/usr/share/glvnd/egl_vendor.d/10_nvidia.json
+AX="apptainer exec --nv --cleanenv -B /nfs/hpc -B $EGL:/etc/neuro_egl.json --env __EGL_VENDOR_LIBRARY_FILENAMES=/etc/neuro_egl.json,DISPLAY=${DISPLAY:-}"
+cmd=${1:-help}; shift || true
+
+submit() {  # $1 mode, $2 duration, rest: args for neuro inside the image
+  local mode=$1 dur=$2; shift 2
+  local js; js=$(mktemp "$RUNS/.job_XXXXXX.sh")
+  printf '#!/bin/bash\nexec %s --env SLURM_JOB_ID=$SLURM_JOB_ID,NEURO_OUT=%s/$SLURM_JOB_ID %s /opt/neuro/neuro %s %s\n' "$AX" "$RUNS" "$SIF" "$mode" "$*" > "$js"
+  sbatch --parsable -J neuro_$mode -p "$PART" --gres=gpu:1 -c 8 --mem=32G -t $(( dur / 60 + 15 )) -o "$RUNS/%j.slurm.log" "$js"
+}
+attach_env() {  # --cleanenv drops the host env, so pass the target simulation's ROS/GZ ids explicitly
+  source "$1/connect.env"
+  AX="$AX --env ROS_DOMAIN_ID=$ROS_DOMAIN_ID,ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET,ROS_STATIC_PEERS=$ROS_STATIC_PEERS,GZ_PARTITION=$GZ_PARTITION"
+}
+
+case $cmd in
+  run)
+    ctrl=$(readlink -f "$1"); scen=${2:+$(readlink -f "$2")}
+    dur=$( [ -n "$scen" ] && sed -n 's/^duration: *\([0-9]*\).*/\1/p' "$scen" ); dur=${dur:-150}
+    J=$(submit run "$dur" "$ctrl" ${scen:+--scenario $scen} --duration "$dur")
+    echo "job $J -> $RUNS/$J   (live: neuro watch $RUNS/$J ; after: neuro report $RUNS/$J)";;
+  session)
+    scen=${1:+$(readlink -f "$1")}
+    J=$(submit session 3600 ${scen:+--scenario $scen} --duration 3600)
+    echo "session $J -> $RUNS/$J   (wait for 'ready' in status.txt, then: neuro teleop|watch|shell $RUNS/$J)";;
+  watch)  attach_env "$1"; exec $AX $SIF bash -c "source /opt/ros/jazzy/setup.bash; ros2 run rqt_image_view rqt_image_view /demo/dashboard";;
+  teleop) attach_env "$1"; exec $AX $SIF bash -c "source /opt/ros/jazzy/setup.bash; python3 /opt/neuro/gz_demo/teleop_keys.py";;
+  shell)  attach_env "$1"; exec $AX $SIF bash --rcfile <(echo "source /opt/ros/jazzy/setup.bash; export PYTHONPATH=/opt/neuro/gz_demo:\$PYTHONPATH");;
+  exec)   attach_env "$1"; c=$(readlink -f "$2"); exec $AX $SIF bash -c "source /opt/ros/jazzy/setup.bash; PYTHONPATH=/opt/neuro/gz_demo:\$PYTHONPATH python3 $c";;
+  report) python3 -c "import json,sys; m=json.load(open(sys.argv[1]+'/metrics.json')); print(json.dumps({k:v for k,v in m.items() if k!='episodes'},indent=1)); [print(e) for e in m['episodes']]" "$1";;
+  *) sed -n '2,12p' "$0";;
+esac

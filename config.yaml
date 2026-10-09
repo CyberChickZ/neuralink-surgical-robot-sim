@@ -1,0 +1,75 @@
+# Units: m / kg / s / rad (angles in yaml given in deg, converted in code).
+# World frame: z up, x forward (column -> head), y left.
+# Dimensions marked [est] are eyeballed from public video frames (hand-width scale), +-20%.
+
+robot:
+  column:            # fixed base, floor-standing
+    size: [0.35, 0.35, 1.20]          # [est]
+  lift:              # J1 prismatic z (red)
+    origin_z: 1.00                     # lift zero height above floor
+    limits: [-0.30, 0.30]
+  shoulder:          # upper body housing riding on the lift
+    size: [0.30, 0.35, 0.50]           # [est]
+  shoulder_roll:     # J2 revolute about x (blue), at the front hub
+    origin_x: 0.20                     # hub face, in front of shoulder center
+    hub_radius: 0.12
+    hub_length: 0.15
+    limits_deg: [-120, 120]
+  pitch:             # J3 revolute about y (green, nod)
+    limits_deg: [-90, 90]
+  forearm:           # extends forward between pitch and head roll
+    length: 0.25
+    radius: 0.09
+  head_roll:         # J4 revolute about x (orange), at head rear boss
+    limits_deg: [-120, 120]
+  head:              # shell; frame origin on the roll axis at the rear boss
+    size: [0.40, 0.25, 0.25]           # [est] length along roll axis, width, height
+    stage_origin: [0.22, 0.0, -0.10]   # XYZ stage zero, in head frame
+  stage:             # J5/J6 prismatic (pink), head x / head y
+    limits: [-0.025, 0.025]            # covers the 25 mm opening
+  twinz:             # J7 prismatic along needle axis (head -z), + = insert
+    limits: [0.0, 0.030]
+  nc_coupler:        # white cylinder hanging from the stage
+    radius: 0.012
+    length: 0.06
+  cartridge:
+    size: [0.010, 0.004, 0.030]
+  needle:            # real: 40 um W-Re wire; visual radius exaggerated
+    visual_radius: 0.00025
+    length: 0.005
+
+cameras:
+  # All optical axes aim at the focal point = needle tip at stage/twinz zero.
+  # Placed on a ring around the needle axis: azimuth (deg, from head +x), radial dist r, height h above focal point.
+  # Optical frame convention (ROS): z forward (look), x right, y down.
+  - {name: loop_x,     azimuth: 30,  r: 0.05, h: 0.07, hfov_deg: 12}
+  - {name: loop_y,     azimuth: 120, r: 0.05, h: 0.07, hfov_deg: 12}
+  - {name: site_front, azimuth: 0,   r: 0.10, h: 0.09, hfov_deg: 40}
+  - {name: site_rear1, azimuth: 160, r: 0.10, h: 0.09, hfov_deg: 40}
+  - {name: site_rear2, azimuth: 200, r: 0.10, h: 0.09, hfov_deg: 40}
+  - {name: site_side,  azimuth: 270, r: 0.10, h: 0.09, hfov_deg: 40}
+  - {name: top,        azimuth: 90,  r: 0.02, h: 0.12, hfov_deg: 20}
+  - {name: depth,      azimuth: 315, r: 0.08, h: 0.10, hfov_deg: 50}
+
+# ---------------------------------------------------------------------------
+# Brain (SOFA). Local frame: origin = opening center on the undeformed brain surface, z up. Units m/kg/s/Pa.
+brain:
+  radius: 0.020            # tissue cylinder radius (25 mm opening + margin)
+  depth: 0.010             # [brief ~10 mm]
+  opening_radius: 0.0125   # 25 mm craniotomy; top surface outside it is under the skull -> fixed
+  mesh_h_center: 0.0012    # tet edge length at opening center
+  mesh_h_outer: 0.003      # tet edge length at periphery (Bilger: 5k-10k tets)
+  density: 1000.0          # kg/m^3
+  young: 3000.0            # Pa  [Bilger 2014 thesis, SOFA corotational brain]
+  poisson: 0.45            #     [Bilger 2014; Bui 2018]
+  dt: 0.01                 # s   [SOFA examples / CollisionAlgorithm NeedleInsertion]
+  duration: 3.0            # s, exported loop (seamless: 1 Hz card + 1/3 Hz resp both periodic in 3 s)
+  warmup: 6.0              # s simulated before the exported loop (reach periodic steady state)
+  export_hz: 60
+  motion:                  # bottom pressure drives opening-center surface displacement (calibrated)
+    f_card: 1.0            # Hz  [Ji 2011; Faria 2014]
+    amp_card_pp: 0.0001    # m peak-to-peak [Paulk 2022 human, 80-100 um]
+    f_resp: 0.3333333      # Hz  20/min (normal adult); 0.2 Hz [Faria 2014] does not loop in 3 s
+    amp_resp_pp: 0.0005    # m peak-to-peak [Faria 2014 human, total < 0.8 mm, breathing dominant]
+    drift_total: 0.0        # m, removed: a monotonic drift cannot loop
+  phantom_surface_world: [0.025, -0.6225, 1.025]   # opening center in Isaac world (under needle at lift=0)
