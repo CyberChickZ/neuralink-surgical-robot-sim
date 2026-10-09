@@ -2,12 +2,13 @@
 
 A cluster-deployable simulator for a Neuralink R1-style thread-insertion robot: an engineer submits a robot controller,
 the system runs it against a pulsating, deformable brain with real vasculature, and reports — live and afterwards — what
-the needle touched, punctured and which vessels it hit.
+the needle touched, punctured and which vessels it hit. **Live vessel detail is published as ROS2 topics, so a controller
+can plan insertion sites around the vasculature** (`/brain/vessels`, `/cam/<cam>/vessel_mask`, `/brain/needle_state`).
 
-![dashboard](docs/dashboard.png)
+![dashboard](docs/dashboard.gif)
 
-*Dashboard (live + recorded): robot overview · head-hub camera with vessel ground truth · two orthogonal SOFA tissue
-cross-sections through the needle · status bar (red frame = vessel hit).*
+*Dashboard, 5 fps (naive grid controller, 9 insertions, one vessel hit → red frame): robot overview · head-hub camera
+with vessel ground truth · two orthogonal SOFA tissue cross-sections through the needle · status bar.*
 
 > Not affiliated with Neuralink. The robot geometry and workflow were reconstructed from **public sources only**:
 > Neuralink's YouTube videos and launch events, and the 2019 JMIR white paper (Musk & Neuralink, PMC6914248).
@@ -34,6 +35,17 @@ $N session                                                                     #
 $N watch <run_dir>      # live dashboard      $N teleop <run_dir>   # keyboard control
 $N exec <run_dir> my_controller.py             # drive a live session from another node
 ```
+
+## Vessel topics for planning
+| topic | content |
+|---|---|
+| `/brain/vessels` | PointCloud2, 10 Hz: vessel centrelines `x,y,z,radius,id,burst` in world frame, moving with pulsation + FEM deformation |
+| `/cam/<c0..c3>/vessel_mask` | mono8, 10 Hz: vessel GT pixel-aligned with `/cam/<cam>/image` |
+| `/brain/vessel_map` | rgb8, 10 Hz: top view of the craniotomy with vessels and the needle |
+| `/brain/needle_state` | JSON, 50 Hz: tip, depth, state, nearest vessel id + clearance |
+| `/brain/vessel_burst` | JSON event: vessel hit |
+
+Full interface: [docs/TOPICS.md](docs/TOPICS.md).
 
 ## Writing a controller
 ```python
