@@ -18,7 +18,7 @@ while [ $# -gt 0 ]; do case $1 in
 [ -n "$OUT" ] || { echo "--out required"; exit 2; }
 mkdir -p "$OUT"
 if [ -n "$SCEN" ]; then cp "$SCEN" "$OUT/scenario.yaml"; export NEURO_SCENARIO="$OUT/scenario.yaml"
-  d=$(sed -n 's/^duration: *\([0-9.]*\).*/\1/p' "$SCEN"); [ -n "$d" ] && DUR=${d%.*}; fi
+  d=$(sed -n 's/^duration: *\([0-9.]*\).*/\1/p' "$SCEN"); [ "$MODE" = run ] && [ -n "$d" ] && DUR=${d%.*}; fi
 JOB=${SLURM_JOB_ID:-$$}
 export ROS_DOMAIN_ID=$(( 1 + JOB % 100 )) GZ_PARTITION=neuro_${JOB} ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
 # inside the packaged image every process runs directly; on the host each one goes through the container wrapper
@@ -36,7 +36,8 @@ echo "{\"job\": \"$JOB\", \"node\": \"$(hostname)\", \"mode\": \"$MODE\", \"ros_
 [ -n "$CTRL" ] && cp "$CTRL" "$OUT/controller.py"
 
 PIDS=()
-cleanup() { for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done; wait 2>/dev/null; echo "end $(date -Is)" >> "$OUT/status.txt"
+cleanup() { for p in "${PIDS[@]}"; do kill "$p" 2>/dev/null; done; sleep 3
+  for p in "${PIDS[@]}"; do kill -9 "$p" 2>/dev/null; done; wait 2>/dev/null;   # some gz/ros processes ignore SIGTERM echo "end $(date -Is)" >> "$OUT/status.txt"
   [ "$REC" = 1 ] && [ -d "$OUT/bag" ] && $RUN python3 "$ROOT/service/report.py" "$OUT" > "$OUT/report.txt" 2>&1; }
 trap cleanup EXIT
 echo "starting $(date -Is) on $(hostname) domain=$ROS_DOMAIN_ID partition=$GZ_PARTITION" > "$OUT/status.txt"
@@ -56,7 +57,6 @@ if [ "$REC" = 1 ]; then
 fi
 $RUN python3 "$ROOT/gz_demo/dashboard_node.py" "$OUT" > "$OUT/dashboard.log" 2>&1 & PIDS+=($!)
 echo "ready $(date -Is)" >> "$OUT/status.txt"
-( sleep 6; { nproc; top -b -n 1 -u "$USER" | head -22; } > "$OUT/top.txt" ) &
 
 if [ "$MODE" = run ]; then
   [ -n "$CTRL" ] || { echo "--controller required in run mode"; exit 2; }
