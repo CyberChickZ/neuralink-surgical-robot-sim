@@ -20,7 +20,7 @@ for i in np.argsort(-clear):                                      # greedy: larg
 rb.event(f"vessel-aware: {len(sites)} sites, min planned clearance {min(clear[np.argsort(-clear)][:len(sites)])*1e6:.0f} um")
 for x, y in sites:
     rb.move_tip(float(x), float(y))
-    r = rb.insert(depth=0.004, speed=0.01)
+    r = rb.insert(depth=0.004)
     rb.event(f"site ({x*1e3:+.1f},{y*1e3:+.1f}) mm: punctured={r['punctured']} peak={r['peak_force_n']*1e3:.2f}mN hits={r['hits']}")
     rb.retract()
 rb.event(f"vessel-aware: done, total vessel hits {len(rb.hits)}")

@@ -112,7 +112,7 @@ class SofaBrainNode(BrainNode):
         if self.punctured and depth < -CONTACT_TOL:
             self.punctured = False                       # needle withdrawn above the surface
         self.peak = max(self.peak, self.force) if (self.force > 0 or self.punctured) else 0.0   # peak of the current contact
-        if not self.punctured and self.force > F_PUNCT:
+        if not self.punctured and self.force >= F_PUNCT * (1 - 1e-9):
             self.punctured = True; self.force = 0.0
             self.p_burst.publish(String(data=json.dumps({"t": t, "event": "puncture", "tip_world": tip.round(6).tolist()})))
         state = ("off_tissue" if depth > DEPTH_MAX or np.linalg.norm(tip[:2]) > self.R_block else
@@ -146,6 +146,7 @@ class SofaBrainNode(BrainNode):
         if len(sel) == 0:
             self.force = 0.0; self.needle_ff.indices.value = [int(self.top[0])]; self.needle_ff.forces.value = [[0, 0, 0]]; return
         f = -K_CONTACT * (P[sel, 2] - tip[2])
+        f *= min(1.0, F_PUNCT / float(-f.sum()))         # tissue tears at F_PUNCT: a fast needle (mm per step) never loads it more
         self.force = float(-f.sum())
         self.needle_ff.indices.value = sel.tolist()
         self.needle_ff.forces.value = np.column_stack([np.zeros(len(sel)), np.zeros(len(sel)), f]).tolist()

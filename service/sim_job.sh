@@ -64,5 +64,7 @@ if [ "$MODE" = run ]; then
   echo "controller exit $? $(date -Is)" >> "$OUT/status.txt"
   sleep 1
 else
+  $RUN python3 "$ROOT/service/run_controller.py" > "$OUT/controller.log" 2>&1   # session: initial state only
+  echo "initial state applied $(date -Is)" >> "$OUT/status.txt"
   sleep "$DUR"
 fi

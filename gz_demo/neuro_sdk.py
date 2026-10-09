@@ -138,7 +138,7 @@ class Robot:
         """Lower TwinZ at `speed` (m/s; default = scenario needle.insert_speed) until the tip is `depth` below the cortex.
         Returns {'punctured', 'depth_m', 'peak_force_n', 'hits': [vessel ids hit during this insertion]}."""
         speed = speed or self.needle_speed()[0]
-        n_hits0, peak = len(self.hits), 0.0
+        n_hits0, peak, punct = len(self.hits), 0.0, False
         z0 = self.cmd["twinz_insert"]; t0 = time.time()
         while True:
             z = z0 - speed * (time.time() - t0)
@@ -146,10 +146,12 @@ class Robot:
                 break
             self._send({"twinz_insert": z}); self.spin(0.002)
             s = self._state; peak = max(peak, s.get("needle_force_n", 0.0), s.get("contact_peak_force_n", 0.0))
+            punct = punct or s.get("punctured", False)
             if s.get("state") == "inserted" and s.get("depth_m", 0.0) >= depth:
+                self._send({"twinz_insert": self.q["twinz_insert"]})   # hold where it is: the joint lags the command at speed
                 break
         self.spin(0.05)
-        return {"punctured": self._state.get("punctured", False), "depth_m": self._state.get("depth_m"),
+        return {"punctured": punct or self._state.get("punctured", False), "depth_m": self._state.get("depth_m"),
                 "peak_force_n": peak, "hits": [h["vessel_id"] for h in self.hits[n_hits0:]]}
 
     def retract(self, speed=None):

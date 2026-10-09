@@ -1,5 +1,5 @@
 """Launcher for an engineer's controller: applies the scenario's initial robot state, then runs the controller
-script with neuro_sdk importable. Usage: python3 run_controller.py <controller.py>   (NEURO_SCENARIO = scenario file)
+script with neuro_sdk importable. Usage: python3 run_controller.py [controller.py]  (no script: initial state only)   (NEURO_SCENARIO = scenario file)
 """
 import runpy
 import sys
@@ -13,4 +13,5 @@ rb = Robot(name="scenario_init")
 rb.move_joints({**{j: 0.0 for j in ("arm_roll_z", "wrist_pitch_x", "head_rot", "stage_x", "stage_z", "twinz_insert")}, **init})
 rb.event(f"initial state applied: {init}")
 rb.n.destroy_node()
-runpy.run_path(sys.argv[1], run_name="__main__")
+if len(sys.argv) > 1:
+    runpy.run_path(sys.argv[1], run_name="__main__")

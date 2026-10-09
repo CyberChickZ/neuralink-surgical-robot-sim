@@ -32,7 +32,7 @@ attach_env() {  # --cleanenv drops the host env, so pass the target simulation's
 case $cmd in
   run)
     ctrl=$(readlink -f "$1"); scen=${2:+$(readlink -f "$2")}
-    dur=$( [ -n "$scen" ] && sed -n 's/^duration: *\([0-9]*\).*/\1/p' "$scen" ); dur=${dur:-150}
+    dur=${scen:+$(sed -n 's/^duration: *\([0-9]*\).*/\1/p' "$scen")}; dur=${dur:-150}
     J=$(submit run "$dur" "$ctrl" ${scen:+--scenario $scen} --duration "$dur")
     echo "job $J -> $RUNS/$J   (live: neuro watch $RUNS/$J ; after: neuro report $RUNS/$J)";;
   session)
